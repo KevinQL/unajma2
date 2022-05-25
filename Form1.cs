@@ -49,7 +49,10 @@ namespace unajma2
 
                 //Usamos el metodo para ejecutar consultas del objeto conexion que se instancio mas arriba. 
                 //Esto devuelve un objeto que mas adelante se puede recorrer con un bucle
-                MySqlDataReader reader = ObjConex.ejecutar_consulta(consulta);
+                try
+                {
+                    MySqlDataReader reader = ObjConex.ejecutar_consulta(consulta);
+                
 
                 //verificamos si existen registro en la base de datos
                 if (reader.HasRows)
@@ -158,7 +161,7 @@ namespace unajma2
                             for (; ; )
                             {
                                 i++;
-                                await Task.Delay(60000 * 10); // intervalo cada un minuto * n
+                                await Task.Delay(4000 * 1); // intervalo cada un minuto * n
 
                                 Console.WriteLine("Control programas " + i);
                                 if (ctrl_interval || (i == time_interval || i == (time_interval * 2)
@@ -211,6 +214,13 @@ namespace unajma2
                     label4.Text = "...";
                     //MessageBox.Show("La cuenta no se encuentra Registrado!!");
 
+                }
+
+
+                }
+                catch (Exception error)
+                {
+                    Console.WriteLine("1. No tiene conexion: Detalles. " + error);
                 }
 
             }
@@ -381,15 +391,21 @@ namespace unajma2
             //---------------------- KO 1
 
 
+            try
+            {
+                //ENVIAR AL SERVIDOR LA INFORMACION CAPTURADA.
+                String consulta3 = $"INSERT INTO control_programas " +
+                    $"(id, dni, v_abiertas, pin_enproceso, tp_enproceso, tp_instalados, fecha_registro) " +
+                    $"VALUES (NULL, '{dniEstudent}', '{ListProg_inv_en_ejec}', '{ListProg_inv}', '{ListProg_t_en_ejec}', '{ListProg_t}', current_timestamp())";
 
-            //ENVIAR AL SERVIDOR LA INFORMACION CAPTURADA.
-            String consulta3 = $"INSERT INTO control_programas " +
-                $"(id, dni, v_abiertas, pin_enproceso, tp_enproceso, tp_instalados, fecha_registro) " +
-                $"VALUES (NULL, '{dniEstudent}', '{ListProg_inv_en_ejec}', '{ListProg_inv}', '{ListProg_t_en_ejec}', '{ListProg_t}', current_timestamp())";
+                //Ejecutando consulta de insercion
+                ObjConex.ejecutar_insert(consulta3);
 
-            //Ejecutando consulta de insercion
-            ObjConex.ejecutar_insert(consulta3);
-
+            }
+            catch (Exception error)
+            {
+                Console.WriteLine("2. No se senvió datos. Detalles. " + error);
+            }
             return ExisteProgramas;
         }
 
